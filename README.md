@@ -92,18 +92,7 @@ Esses arquivos podem ser baixados posteriormente pelo usuário.
 
  **Função:** guardar e disponibilizar relatórios e arquivos gerados pela aplicação.  
 
----
 
-##  Resumo Técnico
-
-| Camada | Serviço AWS | Função Principal |
-|:-------|:-------------|:----------------|
-| Interface | **Amazon S3 + CloudFront** | Hospedagem e distribuição do front-end |
-| Autenticação | **Amazon Cognito** | Login, cadastro e tokens JWT |
-| API | **Amazon API Gateway** | Gerenciar e rotear requisições |
-| Lógica | **AWS Lambda** | Processar funções de backend |
-| Dados | **Amazon DynamoDB** | Armazenar listas e itens |
-| Arquivos | **Amazon S3** | Armazenar CSVs e relatórios |
 
 ---
 
