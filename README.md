@@ -1,106 +1,132 @@
-# Gerenciando-Inst-ncias-EC2-na-AWS
-#  Projeto: Consolidação em Gerenciamento de Instâncias EC2 na AWS
+#  Arquitetura Serverless AWS – Gerenciamento de Listas  
 
-##  Descrição do Projeto
+Este projeto foi desenvolvido com o objetivo de **consolidar conhecimentos em arquitetura na AWS**, aplicando conceitos de **computação serverless**, **segurança**, **escalabilidade** e **boas práticas de design de sistemas em nuvem**.  
 
-Este projeto tem como objetivo **consolidar o entendimento e a prática do gerenciamento de instâncias EC2 na AWS**, abordando conceitos fundamentais de infraestrutura em nuvem.  
-O diagrama foi desenvolvido no **Draw.io**, representando uma **arquitetura simplificada em ambiente AWS**, incluindo os principais serviços relacionados à computação, armazenamento e banco de dados.
+A aplicação simula um sistema de **gerenciamento de listas**, onde o usuário pode **criar, editar, listar, buscar, excluir e exportar listas e itens**, com autenticação e persistência de dados totalmente integradas aos serviços da AWS.  
 
 ---
 
-## ☁️ Arquitetura do Projeto
+## ☁️ Visão Geral da Arquitetura
 
-A estrutura deste projeto foi projetada para demonstrar o fluxo e a relação entre os principais componentes da AWS em um cenário prático de uso.  
-O diagrama mostra como uma instância EC2 interage com volumes EBS, usuários e um banco de dados RDS.
+A arquitetura foi desenhada no **draw.io**, utilizando serviços nativos da **AWS** para garantir um ambiente **escalável, seguro e de baixo custo**.  
+Abaixo está o diagrama que representa o fluxo completo da aplicação:
 
-### **Componentes Principais:**
-
-- **Amazon EC2 (Elastic Compute Cloud)**  
-  Instância configurada para executar aplicações em ambiente Linux.  
-  Responsável pelo processamento principal e hospedagem dos serviços da aplicação.
-
-- **Amazon EBS (Elastic Block Store)**  
-  Dois volumes EBS foram adicionados:  
-  - **EBS 1:** Volume principal (sistema operacional).  
-  - **EBS 2:** Volume secundário (armazenamento de dados e backups).  
-  Ambos conectados à instância EC2, garantindo persistência e escalabilidade de armazenamento.
-
-- **Amazon RDS (Relational Database Service)**  
-  Banco de dados relacional utilizado para armazenar dados da aplicação.  
-  Configurado com segurança e acesso controlado apenas pela instância EC2 e pelo usuário autorizado.
-
-- **Usuário AWS**  
-  Usuário IAM com permissões definidas para gerenciamento das instâncias EC2, volumes EBS e RDS.  
-  As políticas de acesso foram configuradas seguindo o princípio de **menor privilégio**.
-
----
-
-## ⚙️ Processos Técnicos Documentados
-
-1. **Criação e Configuração da Instância EC2**  
-   SO: Amazon Linux 2
-
-  Tipo: t2.micro (Free Tier)
-
-  Configurações:
-
-  -Porta 22 (SSH) liberada
-  -Porta 80 (HTTP) liberada
-  -Volume EBS de 8 GB
-  
-  <img width="1920" height="859" alt="496347839-9c087134-1aad-4415-b613-c1acc3b43b53" src="https://github.com/user-attachments/assets/b616abd4-3843-4465-afc0-5911835267a9" />
-
-
-2. **Instância em Execução**
-
-Após o deploy, a instância entrou em estado Running. 
-
-<img width="1920" height="860" alt="496347665-b69bd9d5-ab54-42e7-8150-b90d6552d332" src="https://github.com/user-attachments/assets/85aca74c-d0de-41b4-9e5f-d6c5ec21b6cd" />
-
-
-3.  **Criação da AMI**
-
-Após personalizar a instância, foi criada uma Amazon Machine Image (AMI) personalizada.
-
-4. **Criação de Snapshot EBS**
-
-Snapshot do volume EBS criado como backup e ponto de restauração.
-
-5. **Nova Instância a partir da AMI**
-
-Uma nova instância foi lançada com base na AMI personalizada para validar sua integridade.
-
+![1B075BAF-BB8F-43E0-BB09-B882182BB8E2](https://github.com/user-attachments/assets/850b908f-bf56-49a2-8ba8-e5b638cdff56)
 
 
 ---
 
-## 🗂️ Ferramenta de Diagramação
+##  Fluxo Geral
 
-O **diagrama da arquitetura** foi desenvolvido no **[Draw.io](https://app.diagrams.net/)**, com foco em clareza e boa representação visual dos fluxos de comunicação entre os serviços AWS.
-
-📁 O arquivo do diagrama (.drawio) está disponível neste repositório para visualização .
-
----
-
-## 🧠 Aprendizados e Objetivos
-
-- Compreensão prática sobre o funcionamento de instâncias EC2 e seus volumes de armazenamento.  
-- Integração entre serviços da AWS (EC2 + EBS + RDS).  
-- Aplicação de boas práticas em gerenciamento de usuários e segurança (IAM).
-- Funcionalidade da AWS AMI.
-- Desenvolvimento da capacidade de documentar arquiteturas técnicas de forma clara e profissional.  
+1. O **usuário** acessa o **frontend** (aplicação web) hospedado no **Amazon S3**, distribuído por uma **CDN (CloudFront)**.  
+2. O **Amazon Cognito** gerencia a **autenticação e autorização** do usuário, emitindo **tokens JWT**.  
+3. As requisições são encaminhadas para o **Amazon API Gateway**, que valida o token e aciona as **funções AWS Lambda**.  
+4. As **funções Lambda** realizam as operações de CRUD nas listas e itens.  
+5. Os dados são armazenados no **Amazon DynamoDB**, e relatórios em formato CSV são gerados e salvos no **Amazon S3**.  
 
 ---
 
-## 📌 Tecnologias e Serviços Utilizados
+##  Componentes Principais e Funcionalidades
 
-- **AWS EC2**  
-- **AWS EBS**  
-- **AWS RDS**
-- **AWS AMI**  
-- **AWS IAM**  
-- **Draw.io**
+###  Frontend – Amazon S3 + CDN (CloudFront)
+O **Amazon S3** armazena o **site estático** (HTML, CSS, JS), enquanto o **Amazon CloudFront** atua como **rede de distribuição de conteúdo (CDN)**.  
+Essa combinação garante:  
+- **Baixa latência** e **alta performance** no carregamento;  
+- **Alta disponibilidade** global;  
+- **Segurança via HTTPS** e integração com AWS WAF.  
+
+ **Função:** exibir a interface do usuário e entregar o conteúdo de forma rápida e segura.  
+
 ---
 
+###  Amazon Cognito – Autenticação e Autorização
+O **Amazon Cognito** gerencia o **cadastro, login e controle de acesso** dos usuários.  
+Ele gera **tokens JWT** que são validados pelo **API Gateway** antes de permitir o acesso às **funções Lambda**.  
 
-Este projeto é de uso **educacional** e, criado com o propósito de aprendizado e demonstração de conceitos de Cloud Computing na AWS.
+ **Função:** autenticar usuários, proteger rotas e manter o acesso seguro às APIs.  
+
+---
+
+###  Amazon API Gateway – Gerenciamento de Requisições
+O **Amazon API Gateway** atua como **porta de entrada** para todas as requisições do front-end.  
+Ele:  
+- Valida os tokens do Cognito;  
+- Redireciona requisições para as Lambdas corretas;  
+- Implementa políticas de segurança, limites de requisições e CORS.  
+
+ **Função:** orquestrar o tráfego entre o front-end e o backend (Lambdas).  
+
+---
+
+###  AWS Lambda – Lógica de Negócio Serverless
+As **funções Lambda** executam toda a **lógica da aplicação**, sem a necessidade de servidores.  
+Cada função é independente e responsável por uma operação específica:  
+
+-  **Cadastrar nova lista**  
+-  **Listar listas**  
+-  **Buscar lista por ID**  
+-  **Editar lista**  
+-  **Cadastrar item na lista**  
+-  **Listar itens da lista**  
+-  **Editar item da lista**  
+-  **Excluir item da lista**  
+-  **Gerar CSV da lista**
+
+ **Função:** processar e executar as operações do sistema sob demanda, com escalabilidade automática e custo por uso.  
+
+---
+
+###  Amazon DynamoDB – Banco de Dados NoSQL
+O **Amazon DynamoDB** armazena as **listas e itens**, oferecendo:  
+- **Alta performance e baixa latência**;  
+- **Escalabilidade automática**;  
+- **Integração nativa com Lambda** via SDK da AWS.  
+
+ **Função:** persistir os dados de forma rápida, segura e escalável.  
+
+---
+
+###  Amazon S3 – Armazenamento de Arquivos
+Além do frontend, o **Amazon S3** também é usado para armazenar os **arquivos CSV** gerados pelas Lambdas.  
+Esses arquivos podem ser baixados posteriormente pelo usuário.  
+
+ **Função:** guardar e disponibilizar relatórios e arquivos gerados pela aplicação.  
+
+---
+
+##  Resumo Técnico
+
+| Camada | Serviço AWS | Função Principal |
+|:-------|:-------------|:----------------|
+| Interface | **Amazon S3 + CloudFront** | Hospedagem e distribuição do front-end |
+| Autenticação | **Amazon Cognito** | Login, cadastro e tokens JWT |
+| API | **Amazon API Gateway** | Gerenciar e rotear requisições |
+| Lógica | **AWS Lambda** | Processar funções de backend |
+| Dados | **Amazon DynamoDB** | Armazenar listas e itens |
+| Arquivos | **Amazon S3** | Armazenar CSVs e relatórios |
+
+---
+
+## Reflexão Pessoal
+
+Este laboratório me permitiu:
+
+Consolidar conceitos essenciais da AWS.
+
+Entender na prática como funcionam Lambda e demais serviços.
+
+Criar um ambiente reprodutível, escalável e seguro.
+
+Aumentar minha familiaridade com a Cloud AWS.
+
+
+---
+
+##  Conclusão
+
+Este projeto foi idealizado pensando na **arquitetura AWS** e na aplicação prática dos seus principais componentes.  
+Cada serviço foi escolhido para desempenhar um papel específico dentro da arquitetura serverless, garantindo **segurança, escalabilidade e eficiência**.  
+
+> 💬 “A ideia foi criar uma solução enxuta, segura e escalável — aplicando na prática os principais pilares da arquitetura em nuvem.”  
+
+---
